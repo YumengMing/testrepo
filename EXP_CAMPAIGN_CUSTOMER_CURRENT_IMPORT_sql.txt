@@ -1,0 +1,763 @@
+ SELECT distinct
+    AA.Customer_Id,
+    AA.Tenant_Id,
+    case when AA.Customer_Group_Id is null then AA.Customer_Id  ELSE AA.Customer_Group_Id END AS  Customer_Group_Id,
+    case WHEN AA.Customer_Desc IS NULL THEN   'N/A' ELSE AA.Customer_Desc END AS  Customer_Desc,
+    case WHEN AA.External_Customer_Id IS NULL THEN '999999999' ELSE AA.External_Customer_Id END AS  External_Customer_Id,
+    AA.Legal_Street_Name,
+    AA.Legal_House_Nr,
+    AA.Legal_House_Letter,
+    AA.Legal_Floor,
+    AA.Legal_Door_Nr,
+    AA.Legal_Direction,
+    AA.Legal_Post_Id,
+    AA.Bill_Street_Name,
+    AA.Bill_House_Nr,
+    AA.Bill_House_Letter,
+    AA.Bill_Floor,
+    AA.Bill_Door_Nr,
+    AA.Bill_Direction,
+    AA.Bill_Post_Id,
+    AA.Install_Street_Name,
+    AA.Install_House_Nr,
+    AA.Install_House_Letter,
+    AA.Install_Floor,
+    AA.Install_Door_Nr,
+    AA.Install_Direction,
+    AA.Install_Post_Id,
+    AA.Status_Cd,
+    AA.Credit_Rating_Status_Cd,
+    AA.Fav_Pym_Method_Cd,
+    AA.Legal_Class_Cd,
+    AA.Nace_Cd,
+    AA.Nace_Grp_1_Cd,
+    AA.Nace_Grp_2_Cd,
+    AA.Contact_Phone,
+    AA.Contact_Email,
+    AA.Hierarchy_Id,
+    AA.Parent_Hierarchy_Id,
+    AA.USED_PHONE_1,
+    AA.USED_PHONE_2,
+    AA.USED_PHONE_3,
+    AA.Employee_Nbr_Cat_Cd,
+    AA.First_Name,
+    AA.Last_Name,
+    AA.Full_Name,
+    AA.Frame_Agree_Sign_Date,
+    AA.Frame_Agree_Dur_Months,
+    AA.Frame_Agree,
+    AA.Dsl_Spec_Conf,
+    AA.Data_Sub_Nbr,
+    AA.Sub_Nbr,
+    AA.Voice_Sub_Nbr,
+    AA.Fixed_Sub_Nbr,
+    AA.Fixed_Data_Sub_Nbr,
+    AA.Cc_Support_Ticket_Nbr,
+    AA.Frame_Contract_Exp_Dt,
+    AA.Customer_Prepaid_Subs_Ind,
+    AA.Customer_Account_seg,
+    AA.Account_Manager,
+    AA.Contact_Person_Name
+
+FROM
+    (
+        SELECT
+            ROW_NUMBER() OVER(PARTITION BY A.AWM_KEY ORDER BY A.AWM_KEY DESC ) AS ROWRR ,
+            A.AWM_KEY                                                          AS Customer_Id,
+            B.UNQ_ID_IN_SRC_STM                                                AS Tenant_Id,
+            A.PARENT_CST_ID                                                    AS Customer_Group_Id,
+            A.CST_DESC                               AS Customer_Desc,
+            A.UNQ_ID_IN_SRC_STM                        AS External_Customer_Id,
+            DECODE(D.STR_NM,NULL,'N/A',D.STR_NM)                 AS Legal_Street_Name,
+            DECODE(D.HS_NUM,NULL,'N/A',D.HS_NUM)                 AS Legal_House_Nr,
+            DECODE(D.HS_LTR,NULL,'N/A',D.HS_LTR)                AS Legal_House_Letter,
+            DECODE(D.FLR_NUM,NULL,'N/A',D.FLR_NUM)               AS Legal_Floor,
+            DECODE(D.DOOR_NUM,NULL,'N/A',D.DOOR_NUM)             AS Legal_Door_Nr,
+            DECODE(D.STR_DRC,NULL,'N/A',D.STR_DRC)               AS Legal_Direction,
+            D.PSTCD_AREA_ID                                      AS Legal_Post_Id,
+            DECODE(G.STR_NM,NULL,'N/A',G.STR_NM)                 AS Bill_Street_Name,
+            DECODE(G.HS_NUM,NULL,'N/A',G.HS_NUM)                 AS Bill_House_Nr,
+            DECODE(G.HS_LTR,NULL,'N/A',G.HS_LTR)                 AS Bill_House_Letter,
+            DECODE(G.FLR_NUM,NULL,'N/A',G.FLR_NUM)               AS Bill_Floor,
+            DECODE(G.DOOR_NUM,NULL,'N/A',G.DOOR_NUM)             AS Bill_Door_Nr,
+            DECODE(G.STR_DRC,NULL,'N/A',G.STR_DRC)               AS Bill_Direction,
+            G.PSTCD_AREA_ID                                      AS Bill_Post_Id,
+            DECODE(L.STR_NM,NULL,'N/A',L.STR_NM)                 AS Install_Street_Name,
+            DECODE(L.HS_NUM,NULL,'N/A',L.HS_NUM)                 AS Install_House_Nr,
+            DECODE(L.HS_LTR,NULL,'N/A',L.HS_LTR)                 AS Install_House_Letter,
+            DECODE(L.FLR_NUM,NULL,'N/A',L.FLR_NUM)               AS Install_Floor,
+            DECODE(L.DOOR_NUM,NULL,'N/A',L.DOOR_NUM)             AS Install_Door_Nr,
+            DECODE(L.STR_DRC,NULL,'N/A',L.STR_DRC)               AS Install_Direction,
+            L1.AWM_KEY                                           AS Install_Post_Id,
+            DECODE(A.CST_LF_CYC_ST,NULL,'N/A',A.CST_LF_CYC_ST)   AS Status_Cd,
+            DECODE(A.CST_CR_RSK_RTG,NULL,'N/A',A.CST_CR_RSK_RTG) AS Credit_Rating_Status_Cd,
+            NVL(PYMT.PYMT_MODE,'Cash')                           AS Fav_Pym_Method_Cd,
+            DECODE(A.ORG_STC_TP,NULL,'N/A',A.ORG_STC_TP)         AS Legal_Class_Cd,
+            NULL                                                 AS Nace_Cd,
+            NULL                                                 AS Nace_Grp_1_Cd,
+            NULL                                                 AS Nace_Grp_2_Cd,
+            A.CTC_TEL_NUM                                        AS Contact_Phone,
+            A.CTC_EMAIL_ADR                                      AS Contact_Email,
+            NULL                                                 AS Hierarchy_Id,
+            NULL                                                 AS Parent_Hierarchy_Id,
+            NULL                                                 AS USED_PHONE_1,
+            NULL                                                 AS USED_PHONE_2,
+            NULL                                                 AS USED_PHONE_3,
+            A.ORG_NUM_OF_EMP_RNG                                 AS Employee_Nbr_Cat_Cd,
+            DECODE(A.GVN_NM,'N/A',NULL,A.GVN_NM)                 AS First_Name,
+            DECODE(A.Last_Name,'N/A',NULL,A.Last_Name)           AS Last_Name,
+            DECODE(A.Full_Name,'N/A',NULL,A.Full_Name)           AS Full_Name,
+            LAT.EFF_DT                                           AS Frame_Agree_Sign_Date,
+            CAST(LAT.MONTH_NUM AS INTEGER)                       AS Frame_Agree_Dur_Months,
+            DECODE(LAT.IS_FRAME,NULL,'N',LAT.IS_FRAME)           AS Frame_Agree,
+            NULL                                                 AS Dsl_Spec_Conf,
+            NVL(MBBONLY.DATA_SBSRBR_NUM,0 )                      AS Data_Sub_Nbr,
+            NVL(O.SBSRBR_NUM,0)                                  AS Sub_Nbr,
+            NVL(P.VOICE_SBSRBR_NUM,0 )                           AS Voice_Sub_Nbr,
+            NVL(M.FIXV_SBSRBR_NUM,0)                             AS Fixed_Sub_Nbr,
+            NVL(PP.FIX_SBSRBR_NUM,0)                             AS Fixed_Data_Sub_Nbr,
+            T.CALLG_PH_NUM                                       AS Cc_Support_Ticket_Nbr,
+
+            LAT.END_DT     AS  Frame_Contract_Exp_Dt,
+            CASE WHEN T22.CST_ID IS NOT NULL THEN 'Y' ELSE 'N' END AS Customer_Prepaid_Subs_Ind,
+            A.CST_AC_SEG AS Customer_Account_seg,
+            IDV.FULL_NM AS Account_Manager,
+            A.CTC_PSN_NM AS Contact_Person_Name
+
+        FROM
+            (
+                SELECT
+                    A1.AWM_KEY,
+                    A1.TENANT,
+                    NVL(C1.OBJ_IP_ID,A1.AWM_KEY) AS PARENT_CST_ID,
+                    nvl(A1.GVN_NM,'')||' '||nvl(A1.SURNM,'')     AS CST_DESC,
+                    A1.UNQ_ID_IN_SRC_STM,
+                    A1.LGL_ADR,
+                    A1.AWM_KEY    AS CST_ID,
+                    A1.IDV_CST_ID AS DWM_CST_ID,
+                    A1.CST_LF_CYC_ST,
+                    A1.CST_CR_RSK_RTG,
+                    A1.CTC_TEL_NUM,
+                    EA.EMAIL_USR_ID AS CTC_EMAIL_ADR,
+                    'N/A' AS ORG_NUM_OF_EMP_RNG,
+                    A1.GVN_NM,
+                    A1.SURNM                 AS Last_Name,
+                    A1.GVN_NM||' '||A1.SURNM AS Full_Name,
+                    'N/A'                    AS ORG_STC_TP,
+                    A1.CST_AC_SEG,
+                    A1.CTC_PSN_NM
+
+                FROM
+                    D_IDV_CST_DIM A1
+                LEFT JOIN
+                    A_IP_X_IP_RLTNP C1
+                ON
+                    A1.AWM_KEY = C1.SBJ_IP_ID
+                AND C1.IP_X_IP_RLTNP_TP_ID = 3900002 --3900002
+                AND TO_DATE('20180321','YYYYMMDD') BETWEEN C1.EFF_DT AND NVL(C1.END_DT,
+                    TO_DATE ('99991231','YYYYMMDD'))
+					
+					
+					LEFT JOIN
+    (
+        SELECT
+            IP_ID,
+            MAX(CEA.EMAIL_ADR_ID) AS EMAIL_ADR_ID,
+            MAX(SLCBL_F)          AS SLCBL_F
+        FROM
+            A_IP_X_EMAIL_ADR_RLTNP CEA
+        WHERE
+            (
+                TO_DATE('20180321','YYYYMMDD') BETWEEN CEA.EFF_DT AND NVL(CEA.END_DT,
+                TO_DATE('99991231','YYYYMMDD')))
+        AND CEA.IP_X_EMAIL_ADR_RLTNP_TP_ID=
+            12200003  -- 12200003
+        ---AND CEA.SLCBL_F = ModleDefinCvID.FLAG_TRUE
+        GROUP BY
+            CEA.IP_ID) CEA
+ON
+    A1.AWM_KEY=CEA.IP_ID
+LEFT JOIN
+    A_EMAIL_ADR EA
+ON
+    CEA.EMAIL_ADR_ID=EA.EMAIL_ADR_ID        ---20180130 modified  email address
+					
+				
+					
+                WHERE
+                    TO_DATE('20180321','YYYYMMDD') BETWEEN A1.EFF_FM_DT AND NVL
+                    (A1.EFF_TO_DT, TO_DATE('99991231', 'YYYYMMDD'))
+                UNION
+                SELECT
+                    A2.AWM_KEY,
+                    A2.TENANT,
+                    NVL(C2.AWM_KEY,A2.AWM_KEY) AS PARENT_CST_ID,
+                    A2.PRIM_CMRCL_NM           AS CST_DESC,
+                    A2.UNQ_ID_IN_SRC_STM,
+                    A2.LGL_ADR,
+                    A2.AWM_KEY     AS CST_ID,
+                    A2.CORP_CST_ID AS DWM_CST_ID,
+                    A2.CST_LF_CYC_ST,
+                    A2.CST_CR_RSK_RTG,
+                    A2.CTC_TEL_NUM,
+                    K.EMAIL_USR_ID AS CTC_EMAIL_ADR,
+                    DECODE(A2.ORG_NUM_OF_EMP_RNG,NULL,'N/A',A2.ORG_NUM_OF_EMP_RNG) AS
+                             ORG_NUM_OF_EMP_RNG,
+                    'N/A'                              AS GVN_NM,
+                    A2.PRIM_CMRCL_NM                   AS Last_Name,
+                    A2.PRIM_CMRCL_NM                   AS Full_Name,
+                    DECODE(D.CL_NM,NULL,'N/A',D.CL_NM) AS ORG_STC_TP,
+                    A2.CST_AC_SEG,
+                    A2.CTC_PSN_NM
+                FROM
+                    D_CORP_CST_DIM A2
+                LEFT JOIN
+                    A_ORG B
+                ON
+                    A2.AWM_KEY = B.ORG_ID
+                LEFT JOIN
+                    A_CL_X_IP_RLTNP C
+                ON
+                    B.ORG_ID = C.IP_ID
+                AND C.CL_X_IP_RLTNP_TP_ID =16300011
+                AND TO_DATE('20180321','YYYYMMDD') BETWEEN C.EFF_DT AND NVL(C.END_DT,
+                    TO_DATE ('99991231', 'YYYYMMDD'))
+                LEFT JOIN
+                    A_CV D
+                ON
+                    C.CV_ID = D.CV_ID
+                LEFT JOIN
+                    D_CORP_CST_DIM C2
+                ON
+                    A2.PRN_CO_NM = C2.PRIM_CMRCL_NM
+                AND TO_DATE('20180321','YYYYMMDD') BETWEEN C2.EFF_FM_DT AND NVL
+                    (C2.EFF_TO_DT, TO_DATE('99991231', 'YYYYMMDD'))
+					
+					
+					LEFT JOIN
+    (
+        SELECT
+            IP_ID,
+            EMAIL_ADR_ID,
+            SLCBL_F,
+            EFF_DT,
+            ROW_NUMBER() OVER(PARTITION BY IP_ID ORDER BY PRTY ASC,EFF_DT DESC) AS AN
+        FROM
+            A_IP_X_EMAIL_ADR_RLTNP CEA2
+        WHERE
+            (
+                TO_DATE('20180321','YYYYMMDD') BETWEEN CEA2.EFF_DT AND NVL(CEA2.END_DT,
+                TO_DATE('99991231','YYYYMMDD')))
+        AND CEA2.IP_X_EMAIL_ADR_RLTNP_TP_ID=
+            12200003
+        ----AND SLCBL_F = ModleDefinCvID.FLAG_TRUE  
+		) J
+ON
+    A2.AWM_KEY = J.IP_ID
+AND J.AN=1
+LEFT JOIN
+    A_EMAIL_ADR K
+ON
+    J.EMAIL_ADR_ID=K.EMAIL_ADR_ID ---20180130 modified email address
+ 
+					
+							
+                WHERE
+                    TO_DATE('20180321','YYYYMMDD') BETWEEN A2.EFF_FM_DT AND NVL
+                    (A2.EFF_TO_DT, TO_DATE('99991231', 'YYYYMMDD')) ) A
+        LEFT JOIN
+            (
+                SELECT
+                    AWM_KEY,
+                    PYMT_MODE,
+                    MAX (CNT)
+                FROM
+                    (
+                        SELECT
+                            NVL( IDVCST.AWM_KEY, CORPCST.AWM_KEY) AWM_KEY,
+                            PYMT.PYMT_MODE,
+                            COUNT(1) CNT
+                        FROM
+                            (
+                                SELECT
+                                    CORP_CST_ID,
+                                    IDV_CST_ID,
+                                    PYMT_MODE
+                                FROM
+                                    D_PYMT_DIM A,
+                                    D_CST_PYMT_FCT B
+                                WHERE
+                                    A.PYMT_MODE<>'N/A'
+                                AND A.PYMT_DT>DATE('2015-10-1')-90
+                                AND (
+                                        CORP_CST_ID<>999999999
+                                    OR  IDV_CST_ID<>999999999)
+                                AND B.PYMT_ID =A.PYMT_ID ) PYMT
+                        LEFT JOIN
+                            D_CORP_CST_DIM CORPCST
+                        ON
+                            PYMT.CORP_CST_ID=CORPCST.CORP_CST_ID
+                        AND CORPCST.CORP_CST_ID<>999999999
+                        LEFT JOIN
+                            D_IDV_CST_DIM IDVCST
+                        ON
+                            PYMT.IDV_CST_ID=IDVCST.IDV_CST_ID
+                        AND IDVCST.IDV_CST_ID<>999999999
+                        GROUP BY
+                            NVL( IDVCST.AWM_KEY, CORPCST.AWM_KEY),
+                            PYMT.PYMT_MODE ) A
+                GROUP BY
+                    AWM_KEY,
+                    PYMT_MODE) PYMT
+        ON
+            PYMT.AWM_KEY = A.AWM_KEY
+        LEFT JOIN
+            (
+                SELECT DISTINCT
+                    B1.CL_NM,
+                    B1.UNQ_ID_IN_SRC_STM
+                FROM
+                    SCM_CV_SRC B1
+                where B1.CL_SCM_ID=0
+        AND  B1.SRC_STM_ID=100001) B   -- 100001
+        ON
+            A.TENANT = B.CL_NM
+        LEFT JOIN
+            A_IP_X_PST_ADR_RLTNP PST_ADR
+        ON
+            A.CST_ID=PST_ADR.IP_ID
+        AND TO_DATE('20180321','YYYYMMDD') BETWEEN PST_ADR.EFF_DT AND NVL
+            (PST_ADR.END_DT, TO_DATE ('99991231','YYYYMMDD'))
+        AND PST_ADR.IP_X_PST_ADR_RLTNP_TP_ID IN
+            (
+                SELECT
+                    A.CV_ID
+                FROM
+                    A_CV A,
+                    A_CL_TSL B
+                WHERE
+                    A.CL_SCM_ID=124
+                AND A.CV_ID=B.CV_ID
+                AND B.UNQ_ID_IN_SRC_STM='11')
+        LEFT JOIN
+            A_PST_ADR D
+        ON
+            PST_ADR.PST_ADR_ID=D.PST_ADR_ID
+        LEFT JOIN
+            (
+                SELECT
+                    E1.IP_ID,
+                    E1.AR_ID,
+                    ROW_NUMBER() OVER (PARTITION BY E1.IP_ID ORDER BY E1.EFF_DT DESC) SEQ
+                FROM
+                    A_AR_X_IP_RLTNP E1
+                WHERE
+                    E1.AR_X_IP_RLTNP_TP_ID = 30300002 --
+                    -- 30300002
+                AND TO_DATE('20180321','YYYYMMDD') BETWEEN E1.EFF_DT AND NVL(E1.END_DT,
+                    TO_DATE ('99991231', 'YYYYMMDD')) ) E
+        ON
+            A.CST_ID = E.IP_ID
+        AND E.SEQ = 1
+        LEFT JOIN
+            A_AR_X_LO_RLTNP F
+        ON
+            E.AR_ID = F.AR_ID
+        AND F.AR_X_LO_RLTNP_TP_ID = 15200002--15200002
+            -- 15200002
+        AND TO_DATE('20180321','YYYYMMDD') BETWEEN F.EFF_DT AND NVL(F.END_DT,TO_DATE
+            ('99991231', 'YYYYMMDD' ))
+        LEFT JOIN
+            A_PST_ADR G
+        ON
+            F.LO_ID = G.PST_ADR_ID
+        LEFT JOIN
+            (
+                SELECT
+                    CASE
+                        WHEN H.OWN_IDV_CST_ID<>999999999
+                        THEN OWN_IDV_CST_ID
+                        ELSE CORP_CST_ID
+                    END AS CST_ID,
+                    H.SBSRBR_ID,
+                    H.INSTL_ADR_ID,
+                    ROW_NUMBER() OVER (PARTITION BY (
+                        CASE
+                            WHEN H.OWN_IDV_CST_ID<>999999999
+                            THEN OWN_IDV_CST_ID
+                            ELSE CORP_CST_ID
+                        END) ORDER BY I.EFF_FM_DT DESC) SEQ
+                FROM
+                    D_SBSRBR_AVY_FCT H
+                LEFT JOIN
+                    D_SBSRBR_DIM I
+                ON
+                    H.SBSRBR_ID = I.SBSRBR_ID
+                WHERE
+                    H.BSN_DT = TO_DATE('20180321','YYYYMMDD') )K
+        ON
+            K.SEQ = 1
+        AND A.DWM_CST_ID = K.CST_ID
+        LEFT JOIN
+            D_PST_ADR_DIM L
+        ON
+            K.INSTL_ADR_ID = L.PST_ADR_ID
+        LEFT JOIN
+            D_GEO_AREA_DIM L1
+        ON
+            L.PST_CD= L1.PST_CD
+        AND TO_DATE('20180321','YYYYMMDD') BETWEEN L1.EFF_FM_DT AND NVL(L1.EFF_TO_DT,
+            TO_DATE ('99991231','YYYYMMDD'))
+        AND L1.GEO_AREA_TP = 'Postcode area'
+        LEFT JOIN
+            (
+                SELECT
+                    S1.IP_ID,
+                    MAX(
+                        CASE
+                            WHEN S1.PRTY=1
+                            THEN S1.TEL_ADR_ID
+                        END) USED_PHONE_1,
+                    MAX(
+                        CASE
+                            WHEN S1.PRTY=2
+                            THEN S1.TEL_ADR_ID
+                        END) USED_PHONE_2,
+                    MAX(
+                        CASE
+                            WHEN S1.PRTY=3
+                            THEN S1.TEL_ADR_ID
+                        END) USED_PHONE_3
+                FROM
+                    A_IP_X_TEL_ADR_RLTNP S1
+                INNER JOIN
+                    SCM_CV_SRC T1
+                ON
+                    S1.IP_X_TEL_ADR_RLTNP_TP_ID = T1.CV_ID
+                AND T1.UNQ_ID_IN_SRC_STM = '31'
+                WHERE
+                    TO_DATE('20180321','YYYYMMDD') BETWEEN S1.EFF_DT AND NVL(S1.END_DT,
+                    TO_DATE ('99991231', 'YYYYMMDD'))
+                GROUP BY
+                    S1.IP_ID) S
+        ON
+            A.CST_ID = S.IP_ID
+			
+			LEFT JOIN
+            (
+                SELECT
+                    PP1.OWN_IDV_CST_ID AS CST_ID,
+                    COUNT(*)           AS DATA_SBSRBR_NUM
+                FROM
+                    D_SBSRBR_AVY_FCT PP1
+                INNER JOIN
+                    D_SBSRBR_DIM QQ1
+                ON
+                    PP1.SBSRBR_ID = QQ1.SBSRBR_ID
+               -- AND QQ1.PH_NUM IS NULL
+				 --AND   QQ1.DSL_ID IS NULL
+				 left join  D_PD_OFR_DIM pd 
+				 on  pd.PD_OFR_ID  = pp1.PD_OFR_ID
+                WHERE
+                    PP1.BSN_DT = TO_DATE('20180321','YYYYMMDD')
+                AND PP1.OWN_IDV_CST_ID <> 999999999
+				and pd.IS_MAIN_F='Y'
+				and pd.PD_OFR_HIER_LVL_2_NM= 'Mobil Data'
+			      and TO_DATE('20180321','YYYYMMDD') BETWEEN pd.EFF_FM_DT AND NVL
+                    (pd.EFF_TO_DT, TO_DATE('99991231', 'YYYYMMDD'))
+                GROUP BY
+                    PP1.OWN_IDV_CST_ID
+                UNION
+                SELECT
+                    PP2.CORP_CST_ID AS CST_ID,
+                    COUNT(*)        AS DATA_SBSRBR_NUM
+                FROM
+                    D_SBSRBR_AVY_FCT PP2
+                INNER JOIN
+                    D_SBSRBR_DIM QQ2
+                ON
+                    PP2.SBSRBR_ID = QQ2.SBSRBR_ID
+               -- AND QQ2.DSL_ID IS NULL
+				--AND QQ2.PH_NUM IS NULL
+				 left join  D_PD_OFR_DIM pd 
+				 on  pd.PD_OFR_ID  = pp2.PD_OFR_ID
+                WHERE
+                    PP2.BSN_DT = TO_DATE('20180321','YYYYMMDD')
+                AND PP2. CORP_CST_ID <> 999999999
+				and pd.IS_MAIN_F='Y'
+				and pd.PD_OFR_HIER_LVL_2_NM= 'Mobil Data'
+			      and TO_DATE('20180321','YYYYMMDD') BETWEEN pd.EFF_FM_DT AND NVL
+                    (pd.EFF_TO_DT, TO_DATE('99991231', 'YYYYMMDD'))
+                GROUP BY
+                    PP2.CORP_CST_ID  ) MBBONLY ---Modified on 20171107         
+          ON
+		  A.DWM_CST_ID = MBBONLY.CST_ID
+			
+        LEFT JOIN
+            (
+                SELECT
+                    O1.OWN_IDV_CST_ID AS CST_ID,
+                    COUNT(*)          AS SBSRBR_NUM
+                FROM
+                    D_SBSRBR_AVY_FCT O1
+                WHERE
+                    O1.BSN_DT = TO_DATE('20180321','YYYYMMDD')
+                AND O1.OWN_IDV_CST_ID <> 999999999
+                GROUP BY
+                    O1.OWN_IDV_CST_ID
+                UNION
+                SELECT
+                    O2.CORP_CST_ID AS CST_ID,
+                    COUNT(*)       AS SBSRBR_NUM
+                FROM
+                    D_SBSRBR_AVY_FCT O2
+                WHERE
+                    O2.BSN_DT = TO_DATE('20180321','YYYYMMDD')
+                AND O2. CORP_CST_ID <> 999999999
+                GROUP BY
+                    O2.CORP_CST_ID ) O
+        ON
+            A.DWM_CST_ID = O.CST_ID
+        LEFT JOIN
+            (
+                SELECT
+                    P1.OWN_IDV_CST_ID AS CST_ID,
+                    COUNT(*)          AS VOICE_SBSRBR_NUM
+                FROM
+                    D_SBSRBR_AVY_FCT P1
+                INNER JOIN
+                    D_SBSRBR_DIM Q1
+                ON
+                    P1.SBSRBR_ID = Q1.SBSRBR_ID
+                --AND Q1.PH_NUM IS NOT NULL
+				left join  D_PD_OFR_DIM pd 
+				 on  pd.PD_OFR_ID  = p1.PD_OFR_ID
+                WHERE
+                    P1.BSN_DT = TO_DATE('20180321','YYYYMMDD')
+                AND P1.OWN_IDV_CST_ID <> 999999999
+				AND  pd.IS_MAIN_F='Y'
+				 and pd.PD_OFR_HIER_LVL_2_NM= 'Mobil Tale'
+			      and TO_DATE('20180321','YYYYMMDD') BETWEEN pd.EFF_FM_DT AND NVL (pd.EFF_TO_DT, TO_DATE('99991231', 'YYYYMMDD'))
+				
+                GROUP BY
+                    P1.OWN_IDV_CST_ID
+                UNION
+                SELECT
+                    P2.CORP_CST_ID AS CST_ID,
+                    COUNT(*)       AS VOICE_SBSRBR_NUM
+                FROM
+                    D_SBSRBR_AVY_FCT P2
+                INNER JOIN
+                    D_SBSRBR_DIM Q2
+                ON
+                    P2.SBSRBR_ID = Q2.SBSRBR_ID
+                --AND Q2.PH_NUM IS NOT NULL
+				left join  D_PD_OFR_DIM pd2 
+				 on  pd2.PD_OFR_ID  = p2.PD_OFR_ID
+				 
+                WHERE
+                    P2.BSN_DT = TO_DATE('20180321','YYYYMMDD')
+                AND P2. CORP_CST_ID <> 999999999
+				AND  pd2.IS_MAIN_F='Y'
+				 and pd2.PD_OFR_HIER_LVL_2_NM= 'Mobil Tale'
+			      and TO_DATE('20180321','YYYYMMDD') BETWEEN pd2.EFF_FM_DT AND NVL (pd2.EFF_TO_DT, TO_DATE('99991231', 'YYYYMMDD'))
+				
+                GROUP BY
+                    P2.CORP_CST_ID ) P ---modifued on 2017-11-07
+        ON
+            A.DWM_CST_ID = P.CST_ID
+        LEFT JOIN
+            (
+                SELECT
+                    M1.OWN_IDV_CST_ID AS CST_ID,
+                    COUNT(*)          AS FIXV_SBSRBR_NUM
+                FROM
+                    D_SBSRBR_AVY_FCT M1
+                INNER JOIN
+                    D_SBSRBR_DIM N1
+                ON
+                    M1.SBSRBR_ID = N1.SBSRBR_ID
+               -- INNER JOIN
+                   -- A_FIX_LINE_ADR R1
+               -- ON
+                   -- N1.PH_NUM = R1.LCL_NUM 
+				   left join  D_PD_OFR_DIM pd 
+				 on  pd.PD_OFR_ID  = M1.PD_OFR_ID
+                WHERE
+                    M1.BSN_DT = TO_DATE('20180321','YYYYMMDD')
+                AND M1. OWN_IDV_CST_ID <> 999999999
+				and pd.IS_MAIN_F='Y'
+				and (pd.PD_OFR_HIER_LVL_2_NM= 'Fastnet Tale'  OR PD.PD_OFR_HIER_LVL_3_NM ='Fixed Postpaid Voice')
+			      and TO_DATE('20180321','YYYYMMDD') BETWEEN pd.EFF_FM_DT AND NVL
+                    (pd.EFF_TO_DT, TO_DATE('99991231', 'YYYYMMDD'))
+                GROUP BY
+                    M1.OWN_IDV_CST_ID
+                UNION
+                SELECT
+                    M2.CORP_CST_ID AS CST_ID,
+                    COUNT(*)       AS FIXV_SBSRBR_NUM
+                FROM
+                    D_SBSRBR_AVY_FCT M2
+                INNER JOIN
+                    D_SBSRBR_DIM N2
+                ON
+                    M2.SBSRBR_ID = N2.SBSRBR_ID
+               -- INNER JOIN
+                   -- A_FIX_LINE_ADR R2
+                --ON N2.PH_NUM = R2.LCL_NUM
+				
+				 left join  D_PD_OFR_DIM pd 
+				 on  pd.PD_OFR_ID  = M2.PD_OFR_ID
+                WHERE
+                    M2.BSN_DT = TO_DATE('20180321','YYYYMMDD')
+                AND M2.CORP_CST_ID <> 999999999
+				and pd.IS_MAIN_F='Y'
+				and (pd.PD_OFR_HIER_LVL_2_NM= 'Fastnet Tale'  OR PD.PD_OFR_HIER_LVL_3_NM ='Fixed Postpaid Voice') 
+			      and TO_DATE('20180321','YYYYMMDD') BETWEEN pd.EFF_FM_DT AND NVL
+                    (pd.EFF_TO_DT, TO_DATE('99991231', 'YYYYMMDD'))
+                GROUP BY
+                    M2.CORP_CST_ID ) M  --modified on 2017-11-07
+        ON
+            A.DWM_CST_ID = M.CST_ID
+			
+        LEFT JOIN
+            (
+                SELECT
+                    PP1.OWN_IDV_CST_ID AS CST_ID,
+                    COUNT(*)           AS FIX_SBSRBR_NUM
+                FROM
+                    D_SBSRBR_AVY_FCT PP1
+                INNER JOIN
+                    D_SBSRBR_DIM QQ1
+                ON
+                    PP1.SBSRBR_ID = QQ1.SBSRBR_ID
+                --AND QQ1.DSL_ID IS NOT NULL
+				left join  D_PD_OFR_DIM pd 
+				 on  pd.PD_OFR_ID  = pp1.PD_OFR_ID
+				 
+                WHERE
+                    PP1.BSN_DT = TO_DATE('20180321','YYYYMMDD')
+                AND PP1.OWN_IDV_CST_ID <> 999999999
+				and pd.IS_MAIN_F='Y'
+				and (pd.PD_OFR_HIER_LVL_2_NM= 'Fastnet Data' or PD_OFR_HIER_LVL_3_NM ='Fixed Postpaid Data')
+			      and TO_DATE('20180321','YYYYMMDD') BETWEEN pd.EFF_FM_DT AND NVL
+                    (pd.EFF_TO_DT, TO_DATE('99991231', 'YYYYMMDD'))
+                GROUP BY
+                    PP1.OWN_IDV_CST_ID
+                UNION
+                SELECT
+                    PP2.CORP_CST_ID AS CST_ID,
+                    COUNT(*)        AS FIX_SBSRBR_NUM
+                FROM
+                    D_SBSRBR_AVY_FCT PP2
+                INNER JOIN
+                    D_SBSRBR_DIM QQ2
+                ON
+                    PP2.SBSRBR_ID = QQ2.SBSRBR_ID
+               -- AND QQ2.DSL_ID IS NOT NULL
+			   left join  D_PD_OFR_DIM pd 
+				 on  pd.PD_OFR_ID  = pp2.PD_OFR_ID
+				 
+                WHERE
+                    PP2.BSN_DT = TO_DATE('20180321','YYYYMMDD')
+                AND PP2. CORP_CST_ID <> 999999999
+				and pd.IS_MAIN_F='Y'
+				and (pd.PD_OFR_HIER_LVL_2_NM= 'Fastnet Data' or PD_OFR_HIER_LVL_3_NM ='Fixed Postpaid Data')
+			      and TO_DATE('20180321','YYYYMMDD') BETWEEN pd.EFF_FM_DT AND NVL
+                    (pd.EFF_TO_DT, TO_DATE('99991231', 'YYYYMMDD'))
+                GROUP BY
+                    PP2.CORP_CST_ID ) PP --modified on 2017-11-07
+        ON
+            A.DWM_CST_ID = PP.CST_ID
+			
+        LEFT JOIN
+            (
+                SELECT
+                    T1.CST_ID,
+                    COUNT(T1.CST_ID) AS CALLG_PH_NUM
+                FROM
+                    A_CST_SVC_WRK_ORDR T1
+                WHERE
+                    T1.WRK_ORDR_EXEC_TM>=ADD_MONTHS(TO_DATE('20180321','YYYYMMDD'),-12)
+                GROUP BY
+                    T1.CST_ID) T
+        ON
+            A.CST_ID = T.CST_ID
+        LEFT JOIN
+            (
+                SELECT
+                    IP_ID,
+                    B.MONTH_NUM,
+                    B.IS_FRAME,
+                    B.EFF_DT,
+                    ROW_NUMBER() OVER (PARTITION BY IP_ID ORDER BY B.IS_FRAME DESC) SEQ,
+                    B.END_DT
+                FROM
+                    A_AR_X_IP_RLTNP A
+                LEFT JOIN
+                    (
+                        SELECT
+                            A1.CTR_ID as PD_AR_ID,
+                            A1.TENANT_ID,
+                            A2.EFF_DT,
+                            MONTHS_BETWEEN(TO_DATE('20180321','YYYYMMDD'),A2.EFF_DT) MONTH_NUM,
+                            CASE
+                                WHEN A3.CV_ID IS NOT NULL
+                                THEN 'Y'
+                                ELSE 'N'
+                            END IS_FRAME,
+                            A2.END_DT
+                        FROM
+                            A_CTR A1
+                        INNER JOIN
+                            A_AR A2
+                        ON
+                            A1.CTR_ID = A2.AR_ID
+                        LEFT JOIN
+                            SCM_CV_SRC A3
+                        ON
+                            A1.CTR_TP_ID = A3.CV_ID
+                        AND A3.UNQ_ID_IN_SRC_STM ='10003'
+                        WHERE A3.CV_ID IS NOT NULL
+                    ) B
+                ON
+                    A.AR_ID =B.PD_AR_ID
+                AND A.TENANT_ID = B.TENANT_ID
+                WHERE
+                    AR_X_IP_RLTNP_TP_ID = 30300006
+                AND TO_DATE('20180321','YYYYMMDD') BETWEEN A.EFF_DT AND NVL(A.END_DT,
+                    TO_DATE ('99991231', 'YYYYMMDD'))
+                AND B.MONTH_NUM IS NOT NULL
+                 )LAT
+        ON
+            A.AWM_KEY = LAT.IP_ID
+        AND LAT.SEQ = 1
+        LEFT JOIN 
+        (
+            SELECT DISTINCT
+                CASE
+                    WHEN A.CORP_CST_ID <>999999999
+                    THEN CORP_CST_ID
+                    WHEN A.OWN_IDV_CST_ID <>999999999
+                    THEN OWN_IDV_CST_ID
+                    ELSE 999999999
+                END AS CST_ID
+            FROM
+                D_SBSRBR_AVY_FCT A ,
+                D_SVC_USG_PYMT_TP_DIM B
+            WHERE
+                A.SVC_USG_PYMT_TP_ID=B.SVC_USG_PYMT_TP_ID
+            AND SVC_USG_PYMT_CD='Prepaid'
+            AND A.BSN_DT = TO_DATE('20180321','YYYYMMDD') ) T22
+            ON A.DWM_CST_ID = T22.CST_ID AND T22.CST_ID<>999999999
+
+         LEFT JOIN A_IP_X_IP_RLTNP ASIP  ON ASIP.IP_X_IP_RLTNP_TP_ID=3900003
+        AND TO_DATE('20180321','YYYYMMDD') BETWEEN ASIP.EFF_DT AND NVL(ASIP.END_DT,TO_DATE('99991231', 'YYYYMMDD'))
+        AND ASIP.OBJ_IP_ID=A.AWM_KEY 
+        LEFT JOIN A_IDV IDV ON IDV.IDV_ID=ASIP.SBJ_IP_ID
+        )AA
+WHERE
+    ROWRR = 1
+    and AA.Customer_Id is not null 
+    AND AA.Tenant_Id IS NOT NULL 
+	limit 3;
